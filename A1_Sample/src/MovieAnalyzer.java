@@ -9,206 +9,220 @@ import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toMap;
 
 
+/**
+ * @author 11710301
+ */
 public class MovieAnalyzer {
-    ArrayList<Movie> movies = new ArrayList<>();
+  ArrayList<Movie> movies = new ArrayList<>();
 
-    class Movie {
-        String Series_Title;
-        int Release_Year;
-        String Certificate;
-        String Runtime;
-        String Genre;
-        String IMDB_Rating;
-        String Overview;
-        String Meta_score;
-        String Director;
-        String Star1;
-        String Star2;
-        String Star3;
-        String Star4;
-        int votes;
-        String Gross;
+  class Movie {
+    String Series_Title;
+    int Release_Year;
+    String Certificate;
+    String Runtime;
+    String Genre;
+    String IMDB_Rating;
+    String Overview;
+    String Meta_score;
+    String Director;
+    String Star1;
+    String Star2;
+    String Star3;
+    String Star4;
+    int votes;
+    String Gross;
 
-        Movie(String Series_Title, int Release_Year, String Certificate, String Runtime, String Genre, String IMDB_Rating, String Overview, String Meta_score, String Director, String Star1, String Star2, String Star3, String Star4, int votes, String Gross) {
-            this.Series_Title = Series_Title;
-            this.Release_Year = Release_Year;
-            this.Certificate = Certificate;
-            this.Runtime = Runtime;
-            this.Genre = Genre;
-            this.IMDB_Rating = IMDB_Rating;
-            this.Overview = Overview;
-            this.Meta_score = Meta_score;
-            this.Director = Director;
-            this.Star1 = Star1;
-            this.Star2 = Star2;
-            this.Star3 = Star3;
-            this.Star4 = Star4;
-            this.votes = votes;
-            this.Gross = Gross;
-        }
-
-
+    Movie(String Series_Title, int Release_Year, String Certificate, String Runtime, String Genre, String IMDB_Rating, String Overview, String Meta_score, String Director, String Star1, String Star2, String Star3, String Star4, int votes, String Gross) {
+      this.Series_Title = Series_Title;
+      this.Release_Year = Release_Year;
+      this.Certificate = Certificate;
+      this.Runtime = Runtime;
+      this.Genre = Genre;
+      this.IMDB_Rating = IMDB_Rating;
+      this.Overview = Overview;
+      this.Meta_score = Meta_score;
+      this.Director = Director;
+      this.Star1 = Star1;
+      this.Star2 = Star2;
+      this.Star3 = Star3;
+      this.Star4 = Star4;
+      this.votes = votes;
+      this.Gross = Gross;
     }
 
-    public MovieAnalyzer(String dataset_path) {
 
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(dataset_path), "UTF-8"));
-            reader.readLine();
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                String str;
+}
+  /**
+   * @author 11710301
+   */
 
-                line += ",";
-                Pattern pCells = Pattern
-                        .compile("(\"[^\"]*(\"{2})*[^\"]*\")*[^,]*,");
-                Matcher mCells = pCells.matcher(line);
-                List<String> cells = new LinkedList();
+  @SuppressWarnings("checkstyle:LocalVariableName")
+  public MovieAnalyzer(String dataset_path) {
 
-                while (mCells.find()) {
-                    str = mCells.group();
-                    str = str.replaceAll("\"\"", "&&&");
-                    str = str.replaceAll(
-                            "(?sm)\"?([^\"]*(\"{2})*[^\"]*)\"?.*,", "$1");
-                    str = str.replaceAll("&&&", "\"\"");
-//                    str = str.replaceAll("(?sm)(\"(\"))", "$2");
-                    cells.add(str);
-                }
-//                Movie movie = new Movie(cells.get(1), Integer.parseInt(cells.get(2)), cells.get(3), cells.get(4), cells.get(5), cells.get(6), cells.get(7), cells.get(8), cells.get(9), cells.get(10), cells.get(11), cells.get(12), cells.get(13), Integer.parseInt(cells.get(2)), cells.get(15));
-                Movie movie = new Movie(cells.get(1), Integer.parseInt(cells.get(2)), cells.get(3), cells.get(4), cells.get(5), cells.get(6), cells.get(7), cells.get(8), cells.get(9), cells.get(10), cells.get(11), cells.get(12), cells.get(13), Integer.parseInt(cells.get(14)), cells.get(15));
-                movies.add(movie);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(dataset_path), "UTF-8"));
+      reader.readLine();
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        String str;
+
+        line += ",";
+        Pattern pCells = Pattern
+                .compile("(\"[^\"]*(\"{2})*[^\"]*\")*[^,]*,");
+        Matcher mCells = pCells.matcher(line);
+        List<String> cells = new LinkedList();
+
+        while (mCells.find()) {
+          str = mCells.group();
+          str = str.replaceAll("\"\"", "&&&");
+          str = str.replaceAll(
+                "(?sm)\"?([^\"]*(\"{2})*[^\"]*)\"?.*,", "$1");
+          str = str.replaceAll("&&&", "\"\"");
+          cells.add(str);
         }
+
+        Movie movie = new Movie(cells.get(1), Integer.parseInt(cells.get(2)), cells.get(3),
+                cells.get(4), cells.get(5),
+                cells.get(6), cells.get(7), cells.get(8), cells.get(9), cells.get(10),
+                cells.get(11), cells.get(12), cells.get(13), Integer.parseInt(cells.get(14)), cells.get(15));
+        movies.add(movie);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+    /**
+     * @author 11710301
+     */
+
+  public Map<Integer, Integer> getMovieCountByYear() {
+    Map<Integer, Integer> map = new TreeMap<Integer, Integer>(
+            new Comparator<Integer>() {
+            @Override
+                public int compare(Integer o1, Integer o2) {
+
+                return (int) (o2 - o1);
+            }
+            });
+
+
+    for (int i = 0; i < movies.size(); i++) {
+      int tempYear = movies.get(i).Release_Year;
+      if (map.get(tempYear) == null) {
+        map.put(tempYear, 1);
+      } else {
+        map.put(tempYear, map.get(tempYear) + 1);
+      }
+    }
+    return map;
+  }
+  /**
+   * @author 11710301
+   */
+
+  public Map<String, Integer> getMovieCountByGenre() {
+    Map<String, Integer> map = new TreeMap<String, Integer>();
+    for (Movie movie : movies) {
+      String[] genre = movie.Genre.split(",");
+      for (int j = 0; j < genre.length; j++) {
+        genre[j] = genre[j].trim();
+        if (map.get(genre[j]) == null) {
+          map.put(genre[j], 1);
+        } else {
+              map.put(genre[j], map.get(genre[j]) + 1);
+        }
+      }
+    }
+    Map<String, Integer> sorted = map
+            .entrySet()
+            .stream()
+            .sorted(Collections.reverseOrder(comparingByValue()))
+            .collect(
+                    toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                            LinkedHashMap::new));
+    return sorted;
+
+  }
+  /**
+   * @author 11710301
+   */
+
+  @SuppressWarnings("checkstyle:Indentation")
+  public Map<List<String>, Integer> getCoStarCount() {
+    Map<List<String>, Integer> map = new HashMap<>();
+      for (Movie movie : movies) {
+      String[] stars = new String[4];
+      stars[0] = movie.Star1.trim();
+      stars[1] = movie.Star2.trim();
+      stars[2] = movie.Star3.trim();
+      stars[3] = movie.Star4.trim();
+      String temp;
+      for (int j = 0; j < 4; j++) {
+        for (int k = j + 1; k < 4; k++) {
+          if (stars[j].compareTo(stars[k]) >= 0) {
+            temp = stars[j];
+            stars[j] = stars[k];
+            stars[k] = temp;
+          }
+        }
+      }
+      for (int j = 0; j < 4; j++) {
+        for (int k = j + 1; k < 4; k++) {
+          List<String> tempList = new ArrayList<>();
+          tempList.add(stars[j].trim());
+          tempList.add(stars[k].trim());
+          Iterator<List<String>> iterator = map.keySet().iterator();
+          boolean notInmap = true;
+          while (iterator.hasNext()) {
+            List<String> temp_list = iterator.next();
+            if (temp_list.get(0).equals(tempList.get(0)) && temp_list.get(1).equals(tempList.get(1))) {
+              map.put(temp_list, map.get(temp_list) + 1);
+              notInmap = false;
+            }
+
+          }
+          if (notInmap) {
+              map.put(tempList, 1);
+          }
+      }
     }
 
-    public Map<Integer, Integer> getMovieCountByYear() {
-        Map<Integer, Integer> map = new TreeMap<Integer, Integer>(
-                new Comparator<Integer>() {
-                    @Override
-                    public int compare(Integer o1, Integer o2) {
+      }
 
-                        return (int) (o2 - o1);
-                    }
-                });
-
-
-        for (int i = 0; i < movies.size(); i++) {
-            int temp_year = movies.get(i).Release_Year;
-            if (map.get(temp_year) == null) {
-                map.put(temp_year, 1);
-            } else {
-                map.put(temp_year, map.get(temp_year) + 1);
-            }
-        }
         return map;
     }
 
-    public Map<String, Integer> getMovieCountByGenre() {
-        Map<String, Integer> map = new TreeMap<String, Integer>();
-        for (int i = 0; i < movies.size(); i++) {
-            String genre[] = movies.get(i).Genre.split(",");
-            for (int j = 0; j < genre.length; j++) {
-                genre[j] = genre[j].trim();
-                if (map.get(genre[j]) == null) {
-                    map.put(genre[j], 1);
-                } else {
-                    map.put(genre[j], map.get(genre[j]) + 1);
-                }
-            }
-        }
-        Map<String, Integer> sorted = map.
-                entrySet()
-                .stream()
-                .sorted(Collections.reverseOrder(comparingByValue()))
-                .collect(
-                        toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
-                                LinkedHashMap::new));
-        return sorted;
+  /**
+   * @author 11710301
+   * */
 
+  public List<String> getTopMovies(int top_k, String by) {
+    List<String> list = new ArrayList<>();
+    if (by.equals("runtime")) {
+      for (int i = 0; i < movies.size(); i++) {
+        for (int j = i + 1; j < movies.size(); j++) {
+          if(runTimeBigger(movies.get(j), movies.get(i))) {
+            Collections.swap(movies, i, j);
+          }
+        }
+      }
+      for (int i = 0; i < top_k; i++) {
+        list.add(movies.get(i).Series_Title);
+      }
+    } else {
+      for (int i = 0; i < movies.size(); i++) {
+        for (int j = i + 1; j < movies.size(); j++) {
+          if(overviewBigger(movies.get(j),movies.get(i))) {
+            Collections.swap(movies,i,j);
+          }
+        }
+      }
+      for (int i = 0; i < top_k; i++) {
+        list.add(movies.get(i).Series_Title);
+      }
     }
-
-    public Map<List<String>, Integer> getCoStarCount() {
-        Map<List<String>, Integer> map = new HashMap<>();
-        for (int i = 0; i < movies.size(); i++) {
-            String[] stars = new String[4];
-            stars[0] = movies.get(i).Star1.trim();
-            stars[1] = movies.get(i).Star2.trim();
-            stars[2] = movies.get(i).Star3.trim();
-            stars[3] = movies.get(i).Star4.trim();
-            String temp;
-            for (int j = 0; j < 4; j++) {
-                for (int k = j + 1; k < 4; k++) {
-                    if (stars[j].compareTo(stars[k]) >= 0) {
-                        temp = stars[j];
-                        stars[j] = stars[k];
-                        stars[k] = temp;
-                    }
-                }
-            }
-            for (int j = 0; j < 4; j++) {
-                for (int k = j + 1; k < 4; k++) {
-                    List<String> tempList = new ArrayList<>();
-                    tempList.add(stars[j].trim());
-                    tempList.add(stars[k].trim());
-                    Iterator<List<String>> iterator = map.keySet().iterator();
-                    boolean not_in_map =true;
-                    while (iterator.hasNext()){
-                        List<String> temp_list = iterator.next();
-                        if(temp_list.get(0).equals(tempList.get(0))&&temp_list.get(1).equals(tempList.get(1))){
-                            map.put(temp_list,map.get(temp_list)+1);
-                            not_in_map =false;
-                        }
-
-                    }
-                    if(not_in_map){
-                    map.put(tempList,1);}
-                }
-            }
-
-        }
-//        Iterator<List<String>> iterator = map.keySet().iterator();
-//        int num=0;
-//        while (iterator.hasNext()) {
-//            List<String> key = iterator.next();
-//            int value = map.get(key);
-//            System.out.println("key = " + key + ", value = " + value);
-//            num++;
-//        }
-//        System.out.println(num);
-        return map;
-    }
-
-    public List<String> getTopMovies(int top_k, String by) {
-        List<String> list = new ArrayList<>();
-        if(by.equals("runtime")){
-            for(int i=0;i<movies.size();i++){
-                for(int j=i+1;j<movies.size();j++){
-                    if(runTimeBigger(movies.get(j),movies.get(i))){
-                        Collections.swap(movies,i,j);
-                    }
-                }
-            }
-            for(int i=0;i<top_k;i++){
-                list.add(movies.get(i).Series_Title);
-            }
-        }
-        else {
-            for(int i=0;i<movies.size();i++){
-                for(int j=i+1;j<movies.size();j++){
-                    if(overviewBigger(movies.get(j),movies.get(i))){
-                        Collections.swap(movies,i,j);
-                    }
-                }
-            }
-            for(int i=0;i<top_k;i++){
-                list.add(movies.get(i).Series_Title);
-            }
-        }
-
-        return list;
-    }
+    return list;
+  }
 
     public List<String> getTopStars(int top_k, String by) {
         List<String> list = new ArrayList<>();
@@ -560,19 +574,4 @@ public class MovieAnalyzer {
     }
 
 
-//    public static void main(String[] args) {
-//        MovieAnalyzer k = new MovieAnalyzer("C:/Users/QQ185/IdeaProjects/A1_Sample/resources/imdb_top_500.csv");
-//        Map<List<String>, Integer> answer = k.getCoStarCount();
-//        System.out.println("1.entrySet");
-//        for (Map.Entry<List<String>, Integer> entry : answer.entrySet()) {
-//            System.out.println("key = " + entry.getKey() + ", value = " + entry.getValue());
-//
-//        }
-//        System.out.println(k.movies.get(168).Series_Title);
-//        System.out.println(k.movies.get(168).Star1);
-//
-//
-//
-//
-//    }
 }
